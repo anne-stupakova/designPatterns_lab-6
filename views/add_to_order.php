@@ -4,7 +4,7 @@ namespace Memento;
 session_start();
 
 require_once 'db/DatabaseConnection.php';
-require_once 'models/OrderMod.php';
+require_once 'models/orderMod.php';
 
 abstract class Command {
     protected $app;
@@ -148,8 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_order'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Оформлення замовлення</title>
-    <link rel="stylesheet" href="styles/order.css">
-    <link rel="stylesheet" href="styles/wrapper.css">
+    <link rel="stylesheet" href="../styles/order.css">
+    <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
 <?php include 'wrapper/header.php'; ?>

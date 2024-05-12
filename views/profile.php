@@ -2,8 +2,8 @@
 namespace Memento;
 
 require_once 'db/DatabaseConnection.php';
-require_once 'models/UserMod.php';
-require_once 'models/OrderMod.php';
+require_once 'models/userMod.php';
+require_once 'models/orderMod.php';
 
 session_start();
 
@@ -78,8 +78,8 @@ if (isset($_POST['logout'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    <link rel="stylesheet" href="styles/profile.css">
-    <link rel="stylesheet" href="styles/wrapper.css">
+    <link rel="stylesheet" href="../styles/profile.css">
+    <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
 <?php include 'wrapper/header.php'; ?>

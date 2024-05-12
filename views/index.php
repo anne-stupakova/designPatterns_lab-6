@@ -4,8 +4,8 @@ namespace Memento;
 session_start();
 
 require_once 'db/DatabaseConnection.php';
-require_once 'models/GoodsMod.php';
-require_once 'models/CategoriesMod.php';
+require_once 'models/goodsMod.php';
+require_once 'models/categoriesMod.php';
 
 interface DataFetcher {
     public function fetchCategories();
@@ -105,8 +105,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memento</title>
-    <link rel="stylesheet" href="styles/index.css">
-    <link rel="stylesheet" href="styles/wrapper.css">
+    <link rel="stylesheet" href="../styles/index.css">
+    <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
 <?php include 'wrapper/header.php'; ?>
