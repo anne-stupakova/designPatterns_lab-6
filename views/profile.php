@@ -76,7 +76,7 @@ if (isset($_POST['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Memento</title>
     <link rel="stylesheet" href="../styles/profile.css">
     <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
