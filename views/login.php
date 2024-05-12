@@ -14,8 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email) || empty($password)) {
         $error = "Будь ласка, заповніть усі поля.";
     } else {
-        $dbConnection = DatabaseConnection::getInstance();
-        $connection = $dbConnection->getConnection();
+        $connection = DatabaseConnection::getInstance()->getConnection();
 
         $stmt = $connection->prepare("SELECT * FROM users WHERE email = :email");
         $stmt->bindParam(':email', $email);
@@ -57,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if (isset($error)) { ?>
         <p class="error"><?php echo $error; ?></p>
     <?php } ?>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <form method="post" action="<?php echo SELF_URL; ?>">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
 

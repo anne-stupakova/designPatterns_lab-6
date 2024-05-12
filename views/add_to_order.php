@@ -6,64 +6,32 @@ session_start();
 require_once '../db/DatabaseConnection.php';
 require_once '../models/orderMod.php';
 
-abstract class Command {
+class Command {
     protected $app;
-    protected $editor;
 
-    public function __construct($app, $editor) {
+    public function __construct($app) {
         $this->app = $app;
-        $this->editor = $editor;
     }
 
-    public abstract function execute();
-    public abstract function undo();
+    public function execute() {}
+
+    public function undo() {}
 }
 
 class SubmitOrderCommand extends Command {
-    private $city;
-    private $departmentNumber;
-    private $phone;
-    private $userId;
-    private $productId;
-    private $count;
-    private $allPrice;
+    private $orderData;
     private $error;
 
-    public function __construct($app, $editor, $city, $departmentNumber, $phone, $userId, $productId, $count, $allPrice) {
-        parent::__construct($app, $editor);
-        $this->city = $city;
-        $this->departmentNumber = $departmentNumber;
-        $this->phone = $phone;
-        $this->userId = $userId;
-        $this->productId = $productId;
-        $this->count = $count;
-        $this->allPrice = $allPrice;
+    public function __construct($app, $orderData) {
+        parent::__construct($app);
+        $this->orderData = $orderData;
     }
 
     public function execute() {
-        if (!preg_match("/^\d{1,5}$/", $this->departmentNumber)) {
-            $this->error = "Номер відділення повинен містити від 1 до 5 цифр.";
-            return false;
-        }
-
-        $phonePattern = "/^\+?(\d{1,3})?\s?\(?(\d{3})\)?[\s.-]?(\d{2})[\s.-]?(\d{2,3})[\s.-]?(\d{2,3})$/";
-        if (!preg_match($phonePattern, $this->phone)) {
-            $this->error = "Невірний формат номера телефону.";
-            return false;
-        }
-
         try {
             $stmtInsert = $this->app->getConnection()->prepare("INSERT INTO orders (city, num_department, phone, id_user, id_goods, count, all_price) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-            $stmtInsert->bindParam(1, $this->city);
-            $stmtInsert->bindParam(2, $this->departmentNumber);
-            $stmtInsert->bindParam(3, $this->phone);
-            $stmtInsert->bindParam(4, $this->userId);
-            $stmtInsert->bindParam(5, $this->productId);
-            $stmtInsert->bindParam(6, $this->count);
-            $stmtInsert->bindParam(7, $this->allPrice);
-
-            $stmtInsert->execute();
+            $stmtInsert->execute($this->orderData);
 
             header("Location: index.php");
             exit;
@@ -75,28 +43,12 @@ class SubmitOrderCommand extends Command {
         return true;
     }
 
-    public function undo() {
-        try {
-            $stmtDelete = $this->app->getConnection()->prepare("DELETE FROM orders WHERE id_user = ? AND id_goods = ?");
-            $stmtDelete->bindParam(1, $this->userId);
-            $stmtDelete->bindParam(2, $this->productId);
-            $stmtDelete->execute();
-
-            header("Location: index.php");
-            exit;
-        } catch (\Exception $e) {
-            $this->error = "Помилка відміни замовлення: " . $e->getMessage();
-            return false;
-        }
-
-        return true;
-    }
+    public function undo() {}
 
     public function getError() {
         return $this->error;
     }
 }
-
 class Application {
     private $connection;
 
@@ -108,9 +60,7 @@ class Application {
         return $this->connection;
     }
 }
-
-$dbConnection = DatabaseConnection::getInstance();
-$connection = $dbConnection->getConnection();
+$connection = DatabaseConnection::getInstance()->getConnection();
 $app = new Application($connection);
 
 $error = '';
@@ -123,15 +73,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_order'])) {
     $count = isset($_POST['count']) ? $_POST['count'] : 0;
 
     $stmtPrice = $connection->prepare("SELECT price FROM goods WHERE id = ?");
-    $stmtPrice->bindParam(1, $productId);
-    $stmtPrice->execute();
+    $stmtPrice->execute([$productId]);
     $priceData = $stmtPrice->fetch(\PDO::FETCH_ASSOC);
 
     if ($priceData) {
         $price = $priceData['price'];
         $allPrice = $price * $count;
 
-        $command = new SubmitOrderCommand($app, null, $city, $departmentNumber, $phone, $userId, $productId, $count, $allPrice);
+        $orderData = [
+            $city,
+            $departmentNumber,
+            $phone,
+            $userId,
+            $productId,
+            $count,
+            $allPrice
+        ];
+
+        $command = new SubmitOrderCommand($app, $orderData);
 
         if (!$command->execute()) {
             $error = $command->getError();

@@ -24,8 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $user = new UserMod($name, $email, $hashedPassword);
 
-        $dbConnection = DatabaseConnection::getInstance();
-        $connection = $dbConnection->getConnection();
+        $connection = DatabaseConnection::getInstance()->getConnection();
 
         $stmtCheckEmail = $connection->prepare("SELECT id FROM users WHERE email = :email");
         $stmtCheckEmail->bindParam(':email', $email);
@@ -73,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if (isset($error)) { ?>
         <p class="error"><?php echo $error; ?></p>
     <?php } ?>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <form method="post" action="<?php echo SELF_URL; ?>">
         <label for="name">Ім'я:</label>
         <input type="text" id="name" name="name" required>
 

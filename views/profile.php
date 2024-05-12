@@ -13,8 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user = null;
-$dbConnection = DatabaseConnection::getInstance();
-$connection = $dbConnection->getConnection();
+$connection = DatabaseConnection::getInstance()->getConnection();
 
 $stmt = $connection->prepare("SELECT * FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
@@ -48,7 +47,7 @@ if (isset($_POST['edit'])) {
     $newName = $_POST['new_name'];
     $newEmail = $_POST['new_email'];
 
-    if (!empty($newName) && !empty($newEmail)) {
+    if ($newName && $newEmail) {
         $stmt = $connection->prepare("UPDATE users SET name = :newName, email = :newEmail WHERE id = :userId");
         $stmt->bindParam(':newName', $newName);
         $stmt->bindParam(':newEmail', $newEmail);
@@ -88,7 +87,7 @@ if (isset($_POST['logout'])) {
     <h1>Профіль користувача</h1>
     <h2>Привіт, <?php echo $user['name']; ?>!</h2>
 
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <form method="post" action="<?php echo SELF_URL; ?>">
         <label for="new_name">Ім'я:</label>
         <input type="text" id="new_name" name="new_name" value="<?php echo $user['name']; ?>" required>
 
@@ -98,7 +97,7 @@ if (isset($_POST['logout'])) {
         <button type="submit" name="edit">Зберегти зміни</button>
     </form>
 
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <form method="post" action="<?php echo SELF_URL; ?>">
         <button type="submit" name="logout">Вийти з акаунту</button>
     </form>
 

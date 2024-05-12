@@ -8,3 +8,6 @@
         </ul>
     </nav>
 </header>
+<?php
+$self = htmlspecialchars($_SERVER["PHP_SELF"]);
+define('SELF_URL', $self);

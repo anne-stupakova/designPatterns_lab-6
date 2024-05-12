@@ -58,8 +58,7 @@ class ProxyFetcher implements DataFetcher {
     }
 }
 
-$dbConnection = DatabaseConnection::getInstance();
-$connection = $dbConnection->getConnection();
+$connection = DatabaseConnection::getInstance()->getConnection();
 $fetcher = new ProxyFetcher(new DatabaseFetcher($connection));
 
 function getCategoriesAndProducts(DataFetcher $fetcher) {
@@ -121,14 +120,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
 
 <main class="container">
 
-    <form method="GET" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="search-form">
+    <form method="GET" action="<?php echo SELF_URL; ?>" class="search-form">
         <div class="search-input-wrapper">
             <input type="text" name="search" placeholder="Пошук за назвою" class="search-input">
             <button type="submit" class="search-btn">Пошук</button>
         </div>
-        <?php if (isset($_GET['search'])) : ?>
-            <a href="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="reset-search">Скинути</a>
-        <?php endif; ?>
+        <a href="<?php echo isset($_GET['search']) ? SELF_URL : '#'; ?>" class="reset-search">Скинути</a>
+
     </form>
 
     <?php
@@ -149,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
 
             if ($loggedIn) {
                 echo "<div class='add-to-orders-wrapper'>";
-                echo "<form method='post' action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "'>";
+                echo "<form method='post' action='" . SELF_URL . "'>";
                 echo "<input type='hidden' name='id_goods' value='" . $product->getId() . "'>";
                 echo "<button class='add-to-order-btn' type='submit'>Замовити</button>";
                 echo "</form>";
