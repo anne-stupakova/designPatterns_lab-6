@@ -11,6 +11,14 @@ class CategoriesMod {
         $this->products = [];
     }
 
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getTitle() {
+        return $this->title;
+    }
+
     public function addProduct($product) {
         $this->products[] = $product;
     }
@@ -19,7 +27,8 @@ class CategoriesMod {
         return $this->products;
     }
 
-    public function getTitle() {
-        return $this->title;
+    public function hasProducts() {
+        return !empty($this->products);  // Check if the products array is not empty
     }
 }
+
