@@ -3,9 +3,9 @@ namespace Memento;
 
 session_start();
 
-require_once 'db/DatabaseConnection.php';
-require_once 'models/goodsMod.php';
-require_once 'models/categoriesMod.php';
+require_once '../db/DatabaseConnection.php';
+require_once '../models/goodsMod.php';
+require_once '../models/categoriesMod.php';
 
 interface DataFetcher {
     public function fetchCategories();
@@ -67,11 +67,15 @@ function getCategoriesAndProducts(DataFetcher $fetcher) {
     $productsData = $fetcher->fetchProducts();
     $categories = [];
 
+    $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
+
     foreach ($categoriesData as $categoryData) {
         $category = new CategoriesMod($categoryData['id'], $categoryData['title']);
+        $categoryHasProducts = false;
 
         foreach ($productsData as $productData) {
-            if ($productData['id_categories'] == $categoryData['id']) {
+            if ($productData['id_categories'] == $categoryData['id'] &&
+                (empty($searchQuery) || strpos($productData['title'], $searchQuery) !== false)) {
                 $product = new GoodsMod(
                     $productData['id'],
                     $productData['title'],
@@ -82,14 +86,18 @@ function getCategoriesAndProducts(DataFetcher $fetcher) {
                     $productData['id_categories']
                 );
                 $category->addProduct($product);
+                $categoryHasProducts = true;
             }
         }
 
-        $categories[] = $category;
+        if (empty($searchQuery) || $categoryHasProducts) {
+            $categories[] = $category;
+        }
     }
 
     return $categories;
 }
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
     $_SESSION['id_goods'] = $_POST['id_goods'];
@@ -109,9 +117,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
     <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
-<?php include 'wrapper/header.php'; ?>
+<?php include '../wrapper/header.php'; ?>
 
 <main class="container">
+
+    <form method="GET" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="search-form">
+        <div class="search-input-wrapper">
+            <input type="text" name="search" placeholder="Пошук за назвою" class="search-input">
+            <button type="submit" class="search-btn">Пошук</button>
+        </div>
+        <?php if (isset($_GET['search'])) : ?>
+            <a href="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="reset-search">Скинути</a>
+        <?php endif; ?>
+    </form>
+
     <?php
     $categories = getCategoriesAndProducts($fetcher);
 
@@ -125,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
             echo "<h3>" . $product->getName() . "</h3>";
             echo "<p>Ціна: " . $product->getPrice() . " грн</p>";
             echo "<p>Опис: " . $product->getInfo() . "</p>";
-            $imagePath = 'img_goods/' . $product->getPhoto();
+            $imagePath = '../img_goods/' . $product->getPhoto();
             echo "<img src='" . $imagePath . "' alt='" . $product->getName() . "'>";
 
             if ($loggedIn) {
@@ -147,6 +166,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
     ?>
 </main>
 
-<?php include 'wrapper/footer.php'; ?>
+<?php include '../wrapper/footer.php'; ?>
 </body>
 </html>

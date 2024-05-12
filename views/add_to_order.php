@@ -3,8 +3,8 @@ namespace Memento;
 
 session_start();
 
-require_once 'db/DatabaseConnection.php';
-require_once 'models/orderMod.php';
+require_once '../db/DatabaseConnection.php';
+require_once '../models/orderMod.php';
 
 abstract class Command {
     protected $app;
@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_order'])) {
     <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
-<?php include 'wrapper/header.php'; ?>
+<?php include '../wrapper/header.php'; ?>
 
 <h1>Оформлення замовлення</h1>
 <?php if (!empty($error)) { ?>
@@ -173,6 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_order'])) {
 
     <input type="submit" name="submit_order" value="Оформити замовлення">
 </form>
-<?php include 'wrapper/footer.php'; ?>
+<?php include '../wrapper/footer.php'; ?>
 </body>
 </html>
