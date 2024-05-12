@@ -3,9 +3,9 @@ namespace Memento;
 
 session_start();
 
-require_once 'db/DatabaseConnection.php';
-require_once 'models/goodsMod.php';
-require_once 'models/categoriesMod.php';
+require_once '../db/DatabaseConnection.php';
+require_once '../models/goodsMod.php';
+require_once '../models/categoriesMod.php';
 
 interface DataFetcher {
     public function fetchCategories();
@@ -109,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
     <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
-<?php include 'wrapper/header.php'; ?>
+<?php include '../wrapper/header.php'; ?>
 
 <main class="container">
     <?php
@@ -125,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
             echo "<h3>" . $product->getName() . "</h3>";
             echo "<p>Ціна: " . $product->getPrice() . " грн</p>";
             echo "<p>Опис: " . $product->getInfo() . "</p>";
-            $imagePath = 'img_goods/' . $product->getPhoto();
+            $imagePath = '../img_goods/' . $product->getPhoto();
             echo "<img src='" . $imagePath . "' alt='" . $product->getName() . "'>";
 
             if ($loggedIn) {
@@ -147,6 +147,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_goods'])) {
     ?>
 </main>
 
-<?php include 'wrapper/footer.php'; ?>
+<?php include '../wrapper/footer.php'; ?>
 </body>
 </html>

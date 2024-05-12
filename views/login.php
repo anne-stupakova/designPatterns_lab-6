@@ -1,8 +1,8 @@
 <?php
 namespace Memento;
 
-require_once 'db/DatabaseConnection.php';
-require_once 'models/userMod.php';
+require_once '../db/DatabaseConnection.php';
+require_once '../models/userMod.php';
 require_once 'PasswordStrategy.php';
 
 session_start();
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
-<?php include 'wrapper/header.php'; ?>
+<?php include '../wrapper/header.php'; ?>
 
 <main class="container">
     <h1>Увійти</h1>
@@ -70,6 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
 </main>
 
-<?php include 'wrapper/footer.php'; ?>
+<?php include '../wrapper/footer.php'; ?>
 </body>
 </html>

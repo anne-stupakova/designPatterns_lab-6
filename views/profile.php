@@ -1,9 +1,9 @@
 <?php
 namespace Memento;
 
-require_once 'db/DatabaseConnection.php';
-require_once 'models/userMod.php';
-require_once 'models/orderMod.php';
+require_once '../db/DatabaseConnection.php';
+require_once '../models/userMod.php';
+require_once '../models/orderMod.php';
 
 session_start();
 
@@ -82,7 +82,7 @@ if (isset($_POST['logout'])) {
     <link rel="stylesheet" href="../styles/wrapper.css">
 </head>
 <body>
-<?php include 'wrapper/header.php'; ?>
+<?php include '../wrapper/header.php'; ?>
 
 <main class="container">
     <h1>Профіль користувача</h1>
@@ -116,6 +116,6 @@ if (isset($_POST['logout'])) {
 
 </main>
 
-<?php include 'wrapper/footer.php'; ?>
+<?php include '../wrapper/footer.php'; ?>
 </body>
 </html>
