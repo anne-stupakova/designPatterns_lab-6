@@ -4,6 +4,7 @@ namespace Memento;
 require_once '../db/DatabaseConnection.php';
 require_once '../models/userMod.php';
 require_once '../models/orderMod.php';
+require_once 'PasswordStrategy.php';
 
 session_start();
 
@@ -14,6 +15,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $user = null;
 $connection = DatabaseConnection::getInstance()->getConnection();
+
+$passwordManager = new PasswordManager();
+$strategy = new HashedPasswordStrategy();
+$passwordManager->setStrategy($strategy);
 
 $stmt = $connection->prepare("SELECT * FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
@@ -64,10 +69,53 @@ if (isset($_POST['edit'])) {
     }
 }
 
+if (isset($_POST['change_password'])) {
+    $currentPassword = $_POST['current_password'];
+    $newPassword = $_POST['new_password'];
+    $confirmPassword = $_POST['confirm_password'];
+
+    if ($currentPassword && $newPassword && $confirmPassword) {
+        if ($passwordManager->verifyPassword($currentPassword, $user['password'])) {
+            if ($newPassword === $confirmPassword) {
+                $hashedPassword = $passwordManager->hashPassword($newPassword);
+
+                $stmt = $connection->prepare("UPDATE users SET password = :hashedPassword WHERE id = :userId");
+                $stmt->bindParam(':hashedPassword', $hashedPassword);
+                $stmt->bindParam(':userId', $_SESSION['user_id']);
+
+                if ($stmt->execute()) {
+                    header("Location: profile.php");
+                    exit;
+                } else {
+                    $error = "Не вдалося змінити пароль.";
+                }
+            } else {
+                $error = "Новий пароль не співпадає з підтвердженням.";
+            }
+        } else {
+            $error = "Неправильний поточний пароль.";
+        }
+    } else {
+        $error = "Будь ласка, заповніть усі поля.";
+    }
+}
+
 if (isset($_POST['logout'])) {
     session_destroy();
     header("Location: login.php");
     exit;
+}
+
+if (isset($_POST['delete_account'])) {
+    $stmt = $connection->prepare("DELETE FROM users WHERE id = :userId");
+    $stmt->bindParam(':userId', $_SESSION['user_id']);
+    if ($stmt->execute()) {
+        session_destroy();
+        header("Location: index.php");
+        exit;
+    } else {
+        $error = "Не вдалося видалити акаунт.";
+    }
 }
 ?>
 
@@ -87,6 +135,10 @@ if (isset($_POST['logout'])) {
     <h1>Профіль користувача</h1>
     <h2>Привіт, <?php echo $user['name']; ?>!</h2>
 
+    <?php if (isset($error)) { ?>
+        <p class="error"><?php echo $error; ?></p>
+    <?php } ?>
+
     <form method="post" action="<?php echo SELF_URL; ?>">
         <label for="new_name">Ім'я:</label>
         <input type="text" id="new_name" name="new_name" value="<?php echo $user['name']; ?>" required>
@@ -95,6 +147,19 @@ if (isset($_POST['logout'])) {
         <input type="email" id="new_email" name="new_email" value="<?php echo $user['email']; ?>" required>
 
         <button type="submit" name="edit">Зберегти зміни</button>
+    </form>
+
+    <form method="post" action="<?php echo SELF_URL; ?>">
+        <label for="current_password">Поточний пароль:</label>
+        <input type="password" id="current_password" name="current_password" required>
+
+        <label for="new_password">Новий пароль:</label>
+        <input type="password" id="new_password" name="new_password" required>
+
+        <label for="confirm_password">Підтвердіть новий пароль:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+
+        <button type="submit" name="change_password">Змінити пароль</button>
     </form>
 
     <form method="post" action="<?php echo SELF_URL; ?>">
@@ -112,6 +177,10 @@ if (isset($_POST['logout'])) {
             </div>
         <?php } ?>
     </div>
+
+    <form method="post" action="<?php echo SELF_URL; ?>">
+        <button type="submit" class="delete_btn" name="delete_account" onclick="return confirm('Ви впевнені, що хочете видалити свій акаунт?')">Видалити акаунт</button>
+    </form>
 
 </main>
 
